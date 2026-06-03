@@ -8,7 +8,7 @@ public class BlobService
     public BlobService()
     {
         _client = new BlobServiceClient(
-            new Uri("https://<storage-account>.blob.core.windows.net"),
+            new Uri("https://ochitplstorage.blob.core.windows.net"),
             new DefaultAzureCredential());
     }
 

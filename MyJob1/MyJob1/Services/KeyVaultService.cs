@@ -8,7 +8,7 @@ public class KeyVaultService
     public KeyVaultService()
     {
         _client = new SecretClient(
-            new Uri("https://<vault-name>.vault.azure.net/"),
+            new Uri("https://ochitserviceskeyvault.vault.azure.net/"),
             new DefaultAzureCredential());
     }
 

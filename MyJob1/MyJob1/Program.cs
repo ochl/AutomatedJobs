@@ -4,6 +4,8 @@ using Microsoft.Extensions.Hosting;
 var builder = Host.CreateApplicationBuilder(args);
 
 // Azure clients (Managed Identity via DefaultAzureCredential)
+builder.Services.AddSingleton<BlobService>();
+builder.Services.AddSingleton<KeyVaultService>();
 builder.Services.AddSingleton<JobWorker>();
 
 var host = builder.Build();
