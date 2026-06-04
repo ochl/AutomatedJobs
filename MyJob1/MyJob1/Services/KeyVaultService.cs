@@ -11,7 +11,10 @@ namespace MyJob1.Services
         {
             _client = new SecretClient(
                 new Uri("https://ochitserviceskeyvault.vault.azure.net/"),
-                new DefaultAzureCredential());
+                new DefaultAzureCredential(new DefaultAzureCredentialOptions
+                {
+                    AdditionallyAllowedTenants = { "*" }
+                }));
         }
 
         public async Task<string> GetSecretAsync(string name)

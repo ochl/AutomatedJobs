@@ -9,7 +9,10 @@ var builder = Host.CreateApplicationBuilder(args);
 
 builder.Services.AddSingleton(new BlobServiceClient(
     new Uri("https://ochitplstorage.blob.core.windows.net"),
-    new DefaultAzureCredential()));
+    new DefaultAzureCredential(new DefaultAzureCredentialOptions
+    {
+        AdditionallyAllowedTenants = { "*" }
+    })));
 
 builder.Services.AddSingleton<IBlobStorageService, BlobStorageService>();
 builder.Services.AddSingleton<KeyVaultService>();

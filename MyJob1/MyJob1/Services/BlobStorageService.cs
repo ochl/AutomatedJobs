@@ -71,8 +71,7 @@ namespace MyJob1.Services
 
             string prefix = string.IsNullOrWhiteSpace(folderPrefix) ? string.Empty : folderPrefix.TrimEnd('/') + "/";
 
-            await Parallel.ForEachAsync(
-                container.GetBlobsAsync(BlobTraits.None, BlobStates.None, prefix, cancellationToken),
+            await Parallel.ForEachAsync(container.GetBlobsAsync(BlobTraits.None, BlobStates.None, prefix, cancellationToken),
                 new ParallelOptions
                 {
                     MaxDegreeOfParallelism = maxConcurrency,
@@ -85,8 +84,7 @@ namespace MyJob1.Services
 
                     var blobClient = container.GetBlobClient(blobItem.Name);
 
-                    await using var stream =
-                        await blobClient.OpenReadAsync(cancellationToken: ct);
+                    await using var stream = await blobClient.OpenReadAsync(cancellationToken: ct);
 
                     await processor(blobItem, stream);
                 });
