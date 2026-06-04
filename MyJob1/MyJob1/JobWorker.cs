@@ -1,13 +1,20 @@
 ﻿
+using Azure.Core.Diagnostics;
+using Azure.Identity;
+using Azure.Storage.Blobs;
+using MyJob1.Interfaces;
+using MyJob1.Services;
+
 public class JobWorker
 {
-    private readonly BlobService _blobService;
     private readonly KeyVaultService _keyVault;
+    private readonly IBlobStorageService _blobStorageService;
 
-    public JobWorker(BlobService blobService, KeyVaultService keyVault)
+    public JobWorker(KeyVaultService keyVault, IBlobStorageService blobStorageService)
     {
-        _blobService = blobService;
         _keyVault = keyVault;
+        _blobStorageService = blobStorageService;
+        AzureEventSourceListener.CreateConsoleLogger();
     }
 
     public async Task RunAsync()
@@ -17,18 +24,18 @@ public class JobWorker
         // Optional: fetch secret
         var apiKey = await _keyVault.GetSecretAsync("api-key");
 
-        // Process blobs
-        await foreach (var blob in _blobService.GetBlobsAsync("input-container"))
-        {
-            Console.WriteLine($"Processing: {blob}");
+        await _blobStorageService.ProcessFolderAsync(
+            containerName: "ochitstoragecontainer",
+            folderPrefix: "/OpenEir/",
+            processor: async (blob, stream) =>
+            {   
+                using var reader = new StreamReader(stream);
 
-            // Example processing logic
-            var content = await _blobService.ReadBlobAsync("input-container", blob);
+                var content = await reader.ReadToEndAsync();
 
-            var result = content.ToUpperInvariant();
-
-            await _blobService.WriteBlobAsync("output-container", blob, result);
-        }
+                Console.WriteLine($"Processing {blob.Name}");
+            }, 
+            maxConcurrency:1);
 
         Console.WriteLine("Job completed.");
     }

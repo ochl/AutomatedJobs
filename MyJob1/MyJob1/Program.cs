@@ -1,10 +1,17 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Azure.Identity;
+using Azure.Storage.Blobs;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using MyJob1.Interfaces;
+using MyJob1.Services;
 
 var builder = Host.CreateApplicationBuilder(args);
 
-// Azure clients (Managed Identity via DefaultAzureCredential)
-builder.Services.AddSingleton<BlobService>();
+builder.Services.AddSingleton(new BlobServiceClient(
+    new Uri("https://ochitplstorage.blob.core.windows.net"),
+    new DefaultAzureCredential()));
+
+builder.Services.AddSingleton<IBlobStorageService, BlobStorageService>();
 builder.Services.AddSingleton<KeyVaultService>();
 builder.Services.AddSingleton<JobWorker>();
 

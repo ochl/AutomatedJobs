@@ -1,20 +1,23 @@
 ﻿using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
 
-public class KeyVaultService
+namespace MyJob1.Services
 {
-    private readonly SecretClient _client;
-
-    public KeyVaultService()
+    public class KeyVaultService
     {
-        _client = new SecretClient(
-            new Uri("https://ochitserviceskeyvault.vault.azure.net/"),
-            new DefaultAzureCredential());
-    }
+        private readonly SecretClient _client;
 
-    public async Task<string> GetSecretAsync(string name)
-    {
-        var secret = await _client.GetSecretAsync(name);
-        return secret.Value.Value;
+        public KeyVaultService()
+        {
+            _client = new SecretClient(
+                new Uri("https://ochitserviceskeyvault.vault.azure.net/"),
+                new DefaultAzureCredential());
+        }
+
+        public async Task<string> GetSecretAsync(string name)
+        {
+            var secret = await _client.GetSecretAsync(name);
+            return secret.Value.Value;
+        }
     }
 }
