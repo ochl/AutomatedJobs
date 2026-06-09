@@ -6,13 +6,16 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Abstractions;
 using MyJob1.Interfaces;
 using MyJob1.Services;
+using Serilog;
+using System.Reflection.Metadata;
+using static System.Reflection.Metadata.BlobBuilder;
 
 public class JobWorker
 {
     private readonly KeyVaultService _keyVault;
     private readonly IBlobStorageService _blobStorageService;
     private readonly ILogger<JobWorker> _logger;
-   
+
     public JobWorker(KeyVaultService keyVault, IBlobStorageService blobStorageService, ILogger<JobWorker> logger)
     {
         _keyVault = keyVault;
@@ -25,19 +28,8 @@ public class JobWorker
     {
         try
         {
-            _logger.LogError("Job started -------->");
-            _logger.LogInformation("Application started");
-            _logger.LogWarning("This is a warning");
-            _logger.LogError("This is an error");
-
-
-
-
-            // Give the background sender time to transmit
-            await Task.Delay(TimeSpan.FromSeconds(5));
-
-
-            Console.WriteLine("Job started...");
+            _logger.LogInformation("JobWorker started 4");
+            
 
             // Optional: fetch secret
             var apiKey = await _keyVault.GetSecretAsync("api-key");
@@ -51,22 +43,21 @@ public class JobWorker
 
                     var content = await reader.ReadToEndAsync();
 
+                    Log.Information($"Processing {blob.Name}");
                     Console.WriteLine($"Processing {blob.Name}");
                 },
                 maxConcurrency: 1);
 
             Console.WriteLine("Job completed.");
         }
-        catch
+        catch(Exception ex)
         {
-
+            Log.Information($"Processing {ex.ToString()}");
         }
         finally 
         {
-            _logger.LogError("Job finished");
-
-         
-            await Task.Delay(5000);
+            Log.Information("JobWorker finished 4");
+            Log.CloseAndFlush();
         }
     }
 }

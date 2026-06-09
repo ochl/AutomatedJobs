@@ -30,9 +30,10 @@ Log.Logger = new LoggerConfiguration()
     .WriteTo.ApplicationInsights(telemetryConfiguration, TelemetryConverter.Traces)
     .CreateLogger();
 
-Log.Information("Application started "+DateTime.Now);
+builder.Logging.ClearProviders();
+builder.Logging.AddSerilog();
 
-Log.CloseAndFlush();
+Log.Information("Application started 4 "+DateTime.Now);
 
 
 builder.Services.AddSingleton(typeof(IAppLogger<>), typeof(AppLogger<>));
@@ -40,15 +41,8 @@ builder.Services.AddSingleton<IBlobStorageService, BlobStorageService>();
 builder.Services.AddSingleton<KeyVaultService>();
 builder.Services.AddSingleton<JobWorker>();
 
-builder.Logging.ClearProviders();
-builder.Logging.AddConsole();
-
-
 
 var host = builder.Build();
-
-Console.WriteLine(Environment.GetEnvironmentVariable("APPLICATIONINSIGHTS_CONNECTION_STRING"));
-
 
 var worker = host.Services.GetRequiredService<JobWorker>();
 await worker.RunAsync();
