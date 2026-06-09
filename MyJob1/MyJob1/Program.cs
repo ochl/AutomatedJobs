@@ -31,7 +31,7 @@ Log.Logger = new LoggerConfiguration()
     .CreateLogger();
 
 builder.Logging.ClearProviders();
-builder.Logging.AddSerilog();
+builder.Logging.AddSerilog(Log.Logger);
 
 Log.Information("Application started 4 "+DateTime.Now);
 
