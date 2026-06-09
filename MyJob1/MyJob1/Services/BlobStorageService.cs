@@ -10,10 +10,12 @@ namespace MyJob1.Services
     public sealed class BlobStorageService : IBlobStorageService
     {
         private readonly BlobServiceClient _blobServiceClient;
+        private readonly IAppLogger<BlobStorageService> _logger;
 
-        public BlobStorageService(BlobServiceClient blobServiceClient)
+        public BlobStorageService(BlobServiceClient blobServiceClient, IAppLogger<BlobStorageService> logger)
         {
             _blobServiceClient = blobServiceClient;
+            _logger = logger;
         }
 
         public async IAsyncEnumerable<BlobItem> ListBlobsAsync(string containerName, string? folderPrefix = null, [System.Runtime.CompilerServices.EnumeratorCancellation]CancellationToken cancellationToken = default)
@@ -67,6 +69,8 @@ namespace MyJob1.Services
 
         public async Task ProcessFolderAsync(string containerName, string folderPrefix, Func<BlobItem, Stream, Task> processor, int maxConcurrency = 3, CancellationToken cancellationToken = default)
         {
+            _logger.Info("ProcessFolderAsync {containerName}, {folderPrefix}", containerName, folderPrefix);
+
             var container = _blobServiceClient.GetBlobContainerClient(containerName);
 
             string prefix = string.IsNullOrWhiteSpace(folderPrefix) ? string.Empty : folderPrefix.TrimEnd('/') + "/";
