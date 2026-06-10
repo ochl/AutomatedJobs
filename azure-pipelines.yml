@@ -7,7 +7,7 @@ pool:
 variables:
   imageRepository: myjob1
   containerRegistry: myjobregistry.azurecr.io
-  dockerfilePath: MyJob1/Dockerfile
+  dockerfilePath: Dockerfile
   resourceGroup: SingleServe
   containerAppJob: myjob1
   containerAppEnv: my-my-job-env
