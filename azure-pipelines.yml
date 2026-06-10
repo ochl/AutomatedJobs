@@ -1,19 +1,46 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
 trigger:
 - main
 
 pool:
   vmImage: ubuntu-latest
 
-steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+variables:
+  imageRepository: myjob1
+  containerRegistry: myjobregistry.azurecr.io
+  dockerfilePath: MyJob1/Dockerfile
+  resourceGroup: SingleServe
+  containerAppJob: myjob1
+  containerAppEnv: my-my-job-env
+  tag: $(Build.BuildId)
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+steps:
+
+- task: AzureCLI@2
+  displayName: Login to Azure
+  inputs:
+    azureSubscription: 'MyAzureServiceConnection'
+    scriptType: bash
+    scriptLocation: inlineScript
+    inlineScript: |
+      echo "Logged in"
+
+- task: Docker@2
+  displayName: Build and Push image to ACR
+  inputs:
+    command: buildAndPush
+    containerRegistry: 'MyAcrServiceConnection'
+    repository: $(imageRepository)
+    dockerfile: $(dockerfilePath)
+    tags: |
+      $(tag)
+      latest
+
+
+- task: AzureCLI@2
+  displayName: Update Container Apps Job
+  inputs:
+    azureSubscription: 'MyAzureServiceConnection'
+    scriptType: bash
+    scriptLocation: inlineScript
+    inlineScript: |
+      az containerapp job update --name $(containerAppJob) --resource-group $(resourceGroup) --image $(containerRegistry)/$(imageRepository):$(tag)
