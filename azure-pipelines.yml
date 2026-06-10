@@ -15,6 +15,9 @@ variables:
 
 steps:
 
+- script: ls -R $(Build.SourcesDirectory)
+  displayName: "Show repo structure"
+
 - task: AzureCLI@2
   displayName: Login to Azure
   inputs:
